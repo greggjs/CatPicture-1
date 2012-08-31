@@ -21,31 +21,46 @@ private:
 	static const int kAppHeight = 600;
 	static const int kAppWidth = 800;
 	void drawRectangles(uint8_t* pixels);
+	void drawCircle(uint8_t* pixels);
 	int frames;
 };
 
 void CatPictureApp::drawRectangles(uint8_t* pixels){
-	int rect_Height_Start = 5;
-	int rect_Width_Length = 10;
-	int rect_Height_Length = 15;
-	int rect_Width_Start = 3;
+	int rect_Start = 0;
+	int rect_Height = 10;
+	int rect_Width = 20;
+	int color_Start = 0;
+	int color_Max = 255;
 
-	Color8u c = Color8u(255,0,0);
-	for(int y = 100; y < 300; y++){
-		for(int x = 100; x < 200; x++){
+	Color8u c;
+	while(rect_Start < kAppHeight){
+	for(int y = rect_Start; y < rect_Height; y++){
+		for(int x = rect_Start; x < rect_Width; x++){
+			c = Color8u(color_Start, color_Start, color_Start);
+			color_Start++;
 			pixels[3*(x + y*kTextureSize)] = c.r;
 			pixels[3*(x + y*kTextureSize)+1] = c.g;
 			pixels[3*(x + y*kTextureSize)+2] = c.b;
+			if(color_Start > color_Max){
+				color_Start = 0;
+			}
+			
 		}
 	}
-	/*for(int y = rect_Width_Start; y <= rect_Width_Length; y++){
-		for(int x = rect_Height_Start; x <= rect_Width_Length; x++){
-			int index = (x+y)*3;
-			pixels[index] = 34;
-		}
-	}*/
 
-	
+	rect_Start = rect_Start+rect_Height + 10;
+	if(rect_Height < rect_Start){
+		rect_Height = rect_Start + rect_Height;
+	}
+
+	if(rect_Width < rect_Start){
+		rect_Width = rect_Start + rect_Width;
+	}
+}
+}
+
+void CatPictureApp::drawCircle(uint8_t* pixels){
+
 }
 
 void CatPictureApp::prepareSettings(Settings* settings){
