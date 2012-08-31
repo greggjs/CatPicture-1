@@ -16,16 +16,40 @@ class CatPictureApp : public AppBasic {
 	void draw();
 
 private:
-	float brightness;
-	float brightness2;
-	float brightness3;
 	Surface* mySurface;
-	static const int kTextureSize = 1024; //must be a root of 2
-	gl::Texture myImage;
+	static const int kTextureSize = 1024; //must be a square of 2
+	static const int kAppHeight = 600;
+	static const int kAppWidth = 800;
+	void drawRectangles(uint8_t* pixels);
+	int frames;
 };
 
+void CatPictureApp::drawRectangles(uint8_t* pixels){
+	int rect_Height_Start = 5;
+	int rect_Width_Length = 10;
+	int rect_Height_Length = 15;
+	int rect_Width_Start = 3;
+
+	Color8u c = Color8u(255,0,0);
+	for(int y = 100; y < 300; y++){
+		for(int x = 100; x < 200; x++){
+			pixels[3*(x + y*kTextureSize)] = c.r;
+			pixels[3*(x + y*kTextureSize)+1] = c.g;
+			pixels[3*(x + y*kTextureSize)+2] = c.b;
+		}
+	}
+	/*for(int y = rect_Width_Start; y <= rect_Width_Length; y++){
+		for(int x = rect_Height_Start; x <= rect_Width_Length; x++){
+			int index = (x+y)*3;
+			pixels[index] = 34;
+		}
+	}*/
+
+	
+}
+
 void CatPictureApp::prepareSettings(Settings* settings){
-	(*settings).setWindowSize(800,600);
+	(*settings).setWindowSize(kAppWidth,kAppHeight);
 	(*settings).setResizable(false);
 }
 
@@ -33,10 +57,6 @@ void CatPictureApp::setup()
 {
 	//Loaded my picture from the Asset folder
 	mySurface = new Surface(kTextureSize,kTextureSize,false);
-	brightness = 0.0;
-	brightness2 = 0.2;
-	brightness3 = .5;
-	
 }
 
 void CatPictureApp::mouseDown( MouseEvent event )
@@ -45,27 +65,27 @@ void CatPictureApp::mouseDown( MouseEvent event )
 
 void CatPictureApp::update()
 {
-	brightness = brightness + 0.01;
-	if(brightness > 1.0f) {
-		brightness = 0.0f;
+	uint8_t* pixels = (*mySurface).getData();
+
+	/*
+	for(int y = 5; y<kAppHeight; y+5) {
+		int index = (y*kTextureSize +5)*3;
+		pixels[index] = 100;
 	}
-	brightness2 = brightness2 + 0.02;
-	if(brightness2 > 1.0f) {
-		brightness2 = 0.0f;
-	}
-	brightness3 = brightness3 + 0.01;
-	if(brightness3 > 1.0f) {
-		brightness3 = 0.0f;
-	}
+	for(int y=0; y<kAppHeight; y++){
+		for(int x=0; x<kAppWidth; x++){
+			int index = (y*kTextureSize + x)*3;
+			pixels[index] = 255;
+		}
+	}*/
+	
+	drawRectangles(pixels);
 }
 
 void CatPictureApp::draw()
 {
 	// clear out the window with black
-	
-	gl::clear( Color( brightness, brightness2, brightness3 ) );
-	gl::drawSolidCircle( Vec2f ( 20.0f, 25.0f ), 50.0f, 8);
-	//gl::draw( *mySurface );
+	gl::draw( *mySurface );
 }
 
 CINDER_APP_BASIC( CatPictureApp, RendererGl )
