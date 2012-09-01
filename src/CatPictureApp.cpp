@@ -113,15 +113,35 @@ void CatPictureApp::drawCircle(uint8_t* pixels){
 	}
 }
 
-void CatPictureApp::drawLine(uint8_t*){
+void CatPictureApp::drawLine(uint8_t* pixels){
+	Color8u c;
+	int color = 0;
+	int y_Coord = 100;
 
+	for(int x = 0; x <= kAppWidth; x++){
+		c = Color8u(color, color, color);
+		if(y_Coord <= 300){
+		y_Coord++;
+		pixels[(3*(x + y_Coord*kTextureSize))] = c.r;
+		pixels[(3*(x + y_Coord*kTextureSize)+1)] = c.g;
+		pixels[(3*(x + y_Coord*kTextureSize)+2)] = c.b;
+		}
+		if(y_Coord > 300){
+			for(int i = 0; i <= 200; i++){
+				y_Coord--;
+				pixels[(3*(x + y_Coord*kTextureSize))] = c.r;
+				pixels[(3*(x + y_Coord*kTextureSize)+1)] = c.g;
+				pixels[(3*(x + y_Coord*kTextureSize)+2)] = c.b;
+			}
+		}
+	}
 }
 
 void CatPictureApp::colorWholeSurface(uint8_t* pixels){
 	Color8u c;
 	int cR = 0;
 	int cG = 100;
-	int cB = 200;
+	int cB = 0;
 
 	for(int y = 0; y <= kAppHeight; y++){
 		for(int x = 0; x <= kAppWidth; x++){		
@@ -160,6 +180,7 @@ void CatPictureApp::update()
 	
 	colorWholeSurface(pixels);
 	drawRectangles(pixels);
+	drawLine(pixels);
 	//drawCircle(pixels);
 }
 
