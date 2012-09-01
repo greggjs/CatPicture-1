@@ -24,8 +24,12 @@ private:
 	static const int kColorMax = 255;
 	void drawRectangles(uint8_t* pixels);
 	void drawCircle(uint8_t* pixels);
-	void colorWholeSurface(uint8_t* pixels);
+	void colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR);
 	void drawLine(uint8_t*);
+	void blurSurface(uint8_t*);
+	int cG;
+	int cB;
+	int cR;
 	int frames;
 };
 
@@ -33,9 +37,9 @@ void CatPictureApp::drawRectangles(uint8_t* pixels){
 	int rect_Start = 0;
 	int rect_Height = 10;
 	int rect_Width = 20;
-	int cR = 200;
-	int cG = 100;
-	int cB = 0;
+	cR = 200;
+	cG = 100;
+	cB = 0;
 
 	Color8u c;
 	while(rect_Start <= kAppHeight && rect_Start <= kAppWidth){
@@ -78,9 +82,9 @@ void CatPictureApp::drawCircle(uint8_t* pixels){
 	int x_Center = 10;
 	int radius = 5;
 	Color8u c;
-	int cR = 200;
-	int cG = 100;
-	int cB = 200;
+	cR = 200;
+	cG = 100;
+	cB = 200;
 
 	while(x_Center <= kAppWidth && y_Center <= kAppHeight) {
 	for(int y = y_Center - radius; y <= y_Center+radius; y++){
@@ -137,11 +141,8 @@ void CatPictureApp::drawLine(uint8_t* pixels){
 	}
 }
 
-void CatPictureApp::colorWholeSurface(uint8_t* pixels){
+void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	Color8u c;
-	int cR = 0;
-	int cG = 100;
-	int cB = 0;
 
 	for(int y = 0; y <= kAppHeight; y++){
 		for(int x = 0; x <= kAppWidth; x++){		
@@ -149,14 +150,13 @@ void CatPictureApp::colorWholeSurface(uint8_t* pixels){
 			pixels[(3*(x + y*kTextureSize))] = c.r;
 			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
 			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
-			for(int i = cR; i <= kColorMax; i++){
-			cR++;
-			if(cR > kColorMax){
-				cR=0;
-			}
-		}
-	}	
+		}	
 	}
+}
+
+void CatPictureApp::blurSurface(uint8_t*){
+	static uint8_t work_buffer[3*kTextureSize*kTextureSize];
+	//memcpy(
 }
 
 void CatPictureApp::prepareSettings(Settings* settings){
@@ -168,6 +168,9 @@ void CatPictureApp::setup()
 {
 	//Loaded my picture from the Asset folder
 	mySurface = new Surface(kTextureSize,kTextureSize,false);
+	cG = 10;
+	cB = 250;
+	cR = 0;
 }
 
 void CatPictureApp::mouseDown( MouseEvent event )
@@ -176,9 +179,18 @@ void CatPictureApp::mouseDown( MouseEvent event )
 
 void CatPictureApp::update()
 {
-	uint8_t* pixels = (*mySurface).getData();
-	
-	colorWholeSurface(pixels);
+	uint8_t* pixels = (*mySurface).getData();	
+
+	//How do I keep changing color?
+	cG++;
+	cB++;
+	if(cG > kColorMax){
+		cG = 0;
+	}
+	if(cB > kColorMax) {
+		cB = 0;
+	}
+	colorWholeSurface(pixels, cG, cB, cR);
 	drawRectangles(pixels);
 	drawLine(pixels);
 	//drawCircle(pixels);
