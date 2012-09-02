@@ -27,6 +27,7 @@ private:
 	void colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR);
 	void drawLine(uint8_t*);
 	void blurSurface(uint8_t*);
+	void drawTriangle(uint8_t* pixels);
 	int cG;
 	int cB;
 	int cR;
@@ -34,47 +35,23 @@ private:
 };
 
 void CatPictureApp::drawRectangles(uint8_t* pixels){
-	int rect_Start = 0;
-	int rect_Height = 10;
-	int rect_Width = 20;
+	int rect_X_Start = 250;
+	int rect_Y_Start = 450;
+	int rect_Height = 550;
+	int rect_Width = 550;
 	cR = 200;
-	cG = 100;
+	cG = 0;
 	cB = 0;
 
 	Color8u c;
-	while(rect_Start <= kAppHeight && rect_Start <= kAppWidth){
-	for(int y = rect_Start; y < rect_Height; y++){
-		for(int x = rect_Start; x < rect_Width; x++){
+	for(int y = rect_Y_Start; y < rect_Height; y++){
+		for(int x = rect_X_Start; x < rect_Width; x++){
 			c = Color8u(cG,cB,cR);
-			cG++;
-			cB++;
-			cR++;
-			//pixels[(3*(x + y*kTextureSize))] = c.r;
-			//pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(x + y*kTextureSize))] = c.r;
+			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
 			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
-
-			if(cR > kColorMax){
-				cR = 0;
-			}
-			if(cG > kColorMax){
-				cG = 0;
-			}
-			if(cB > kColorMax){
-				cB = 0;
-			}
-			
 		}
 	}
-
-	rect_Start = rect_Start+rect_Height + 10;
-	if(rect_Height < rect_Start){
-		rect_Height = rect_Start + rect_Height;
-	}
-
-	if(rect_Width < rect_Start){
-		rect_Width = rect_Start + rect_Width;
-	}
-}
 }
 
 void CatPictureApp::drawCircle(uint8_t* pixels){
@@ -141,6 +118,19 @@ void CatPictureApp::drawLine(uint8_t* pixels){
 	}
 }
 
+void CatPictureApp::drawTriangle(uint8_t* pixels){
+	Color8u c;
+	cR = 100;
+	cB = 50;
+	cG = 200;
+	int x_Top = 200;
+	int y_Top = 100;
+	int x_Right = 100;
+	int x_Left = 400;
+	int y_Bottom = 400;
+	
+}
+
 void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	Color8u c;
 
@@ -182,17 +172,21 @@ void CatPictureApp::update()
 	uint8_t* pixels = (*mySurface).getData();	
 
 	//How do I keep changing color?
-	cG++;
-	cB++;
-	if(cG > kColorMax){
-		cG = 0;
-	}
-	if(cB > kColorMax) {
-		cB = 0;
-	}
-	colorWholeSurface(pixels, cG, cB, cR);
+		cG++;
+		cB++;
+		if(cG > kColorMax){
+			cG = 0;
+		}
+		if(cB > kColorMax) {
+			cB = 0;
+		}
+		colorWholeSurface(pixels, cG, cB, cR);
 	drawRectangles(pixels);
 	drawLine(pixels);
+	drawTriangle(pixels);
+
+	//Saves the image to a png file
+	writeImage("brennerCatPic.png",*mySurface);
 	//drawCircle(pixels);
 }
 
