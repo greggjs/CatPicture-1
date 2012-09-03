@@ -23,11 +23,10 @@ private:
 	static const int kAppWidth = 800;
 	static const int kColorMax = 255;
 	void drawRectangles(uint8_t* pixels);
-	void drawCircle(uint8_t* pixels);
+	void drawCircle(uint8_t* pixels, int y_Center, int x_Center, int radius, int cG, int cB, int cR);
 	void colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR);
 	void drawLine(uint8_t*);
 	void blurSurface(uint8_t*);
-	void drawTriangle(uint8_t* pixels);
 	int cG;
 	int cB;
 	int cR;
@@ -54,61 +53,39 @@ void CatPictureApp::drawRectangles(uint8_t* pixels){
 	}
 }
 
-void CatPictureApp::drawCircle(uint8_t* pixels){
-	int y_Center = 10;
-	int x_Center = 10;
-	int radius = 5;
+void CatPictureApp::drawCircle(uint8_t* pixels, int y_Center, int x_Center, int radius, int cG, int cB, int cR){
 	Color8u c;
-	cR = 200;
-	cG = 100;
-	cB = 200;
 
-	while(x_Center <= kAppWidth && y_Center <= kAppHeight) {
 	for(int y = y_Center - radius; y <= y_Center+radius; y++){
 		for(int x = x_Center - radius; x <= x_Center+radius; x++){
 			//int dist = (
 			c = Color8u(cG,cB,cR);
-			cG++;
-			cB++;
-			cR++;
+			int dist = (int)sqrt((double)((x-x_Center)*(x-x_Center))+((y-y_Center)*(y-y_Center)));
+			if(dist < radius){
 			pixels[(3*(x + y*kTextureSize))] = c.r;
-			//pixels[(3*(x + y*kTextureSize)+1)] = c.g;
-			//pixels[(3*(x + y*kTextureSize)+2)] = c.b;
-			//pixels[(3*(y*kTextureSize-x))] = c.r;
-			//pixels[(3*(y*kTextureSize-x)+1)] = c.g;
-			//pixels[(3*(y*kTextureSize-x)+2)] = c.b;
+			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
+			}
 
-			if(cR > kColorMax){
-				cR = 0;
-			}
-			if(cG > kColorMax){
-				cG = 0;
-			}
-			if(cB > kColorMax){
-				cB = 0;
-			}
 		}
-	}
-	y_Center = y_Center*2+radius;
-	x_Center = x_Center*2+radius;
 	}
 }
 
 void CatPictureApp::drawLine(uint8_t* pixels){
 	Color8u c;
 	int color = 0;
-	int y_Coord = 100;
+	int y_Coord = 300;
 
-	for(int x = 0; x <= kAppWidth; x++){
+	for(int x = 200; x <= 600; x++){
 		c = Color8u(color, color, color);
-		if(y_Coord <= 300){
+		if(y_Coord <= 400){
 		y_Coord++;
 		pixels[(3*(x + y_Coord*kTextureSize))] = c.r;
 		pixels[(3*(x + y_Coord*kTextureSize)+1)] = c.g;
 		pixels[(3*(x + y_Coord*kTextureSize)+2)] = c.b;
 		}
-		if(y_Coord > 300){
-			for(int i = 0; i <= 200; i++){
+		if(y_Coord > 400){
+			for(int i = 0; i <= 100; i++){
 				y_Coord--;
 				pixels[(3*(x + y_Coord*kTextureSize))] = c.r;
 				pixels[(3*(x + y_Coord*kTextureSize)+1)] = c.g;
@@ -116,19 +93,6 @@ void CatPictureApp::drawLine(uint8_t* pixels){
 			}
 		}
 	}
-}
-
-void CatPictureApp::drawTriangle(uint8_t* pixels){
-	Color8u c;
-	cR = 100;
-	cB = 50;
-	cG = 200;
-	int x_Top = 200;
-	int y_Top = 100;
-	int x_Right = 100;
-	int x_Left = 400;
-	int y_Bottom = 400;
-	
 }
 
 void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
@@ -144,9 +108,11 @@ void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	}
 }
 
-void CatPictureApp::blurSurface(uint8_t*){
+void CatPictureApp::blurSurface(uint8_t* pixels){
 	static uint8_t work_buffer[3*kTextureSize*kTextureSize];
-	//memcpy(
+	memcpy(work_buffer, pixels, 3*kTextureSize*kTextureSize);
+
+
 }
 
 void CatPictureApp::prepareSettings(Settings* settings){
@@ -160,7 +126,7 @@ void CatPictureApp::setup()
 	mySurface = new Surface(kTextureSize,kTextureSize,false);
 	cG = 10;
 	cB = 250;
-	cR = 0;
+	cR = 100;
 }
 
 void CatPictureApp::mouseDown( MouseEvent event )
@@ -180,14 +146,15 @@ void CatPictureApp::update()
 		if(cB > kColorMax) {
 			cB = 0;
 		}
-		colorWholeSurface(pixels, cG, cB, cR);
+	colorWholeSurface(pixels, cG, cB, cR);
 	drawRectangles(pixels);
 	drawLine(pixels);
-	drawTriangle(pixels);
+	drawCircle(pixels, 150, 250, 50, 20, 230, 100);
+	drawCircle(pixels, 150, 550, 50, 20, 230, 100);
+	drawCircle(pixels, 250, 400, 25, 125, 125, 125);
 
 	//Saves the image to a png file
 	writeImage("brennerCatPic.png",*mySurface);
-	//drawCircle(pixels);
 }
 
 void CatPictureApp::draw()
