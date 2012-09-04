@@ -25,8 +25,10 @@ private:
 	void drawRectangles(uint8_t* pixels);
 	void drawCircle(uint8_t* pixels, int y_Center, int x_Center, int radius, int cG, int cB, int cR);
 	void colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR);
-	void drawLine(uint8_t*);
-	void blurSurface(uint8_t*);
+	void drawLine(uint8_t* pixels);
+	void drawTriangle(uint8_t* pixels);
+	void tintSurface(uint8_t* pixels);
+	void blurSurface(uint8_t* pixels);
 	int cG;
 	int cB;
 	int cR;
@@ -58,7 +60,6 @@ void CatPictureApp::drawCircle(uint8_t* pixels, int y_Center, int x_Center, int 
 
 	for(int y = y_Center - radius; y <= y_Center+radius; y++){
 		for(int x = x_Center - radius; x <= x_Center+radius; x++){
-			//int dist = (
 			c = Color8u(cG,cB,cR);
 			int dist = (int)sqrt((double)((x-x_Center)*(x-x_Center))+((y-y_Center)*(y-y_Center)));
 			if(dist < radius){
@@ -66,7 +67,6 @@ void CatPictureApp::drawCircle(uint8_t* pixels, int y_Center, int x_Center, int 
 			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
 			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
 			}
-
 		}
 	}
 }
@@ -95,6 +95,37 @@ void CatPictureApp::drawLine(uint8_t* pixels){
 	}
 }
 
+void CatPictureApp::drawTriangle(uint8_t* pixels){
+	Color8u c = Color8u(255,255,255);
+	for(int y = 0; y < 200; y++){
+		for(int x = 0; x < y; x++){
+			pixels[(3*(x + y*kTextureSize))] = c.r;
+			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
+		}
+	}
+
+	/*for(int y = 0; y < 200; y++){
+		for(int s = 0 - y; s > 0; s--){
+			c = Color8u(200,200,200);
+			pixels[(3*(s + y*kTextureSize))] = c.r;
+			pixels[(3*(s + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(s + y*kTextureSize)+2)] = c.b;
+
+		} 
+
+		for(int x = 500; x < kAppWidth; x++){
+			k = y-(x-300);
+			if(k>=0){
+				c = Color8u(255,255,255);
+					pixels[(3*(x + y*kTextureSize))] = c.r;
+					pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+					pixels[(3*(x + y*kTextureSize)+2)] = c.b;
+				}
+		}*/
+	//}
+}
+
 void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	Color8u c;
 
@@ -108,7 +139,33 @@ void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	}
 }
 
+//Tints the picture a certain color, taken from http://processing.org/learning/pixels/
+void CatPictureApp::tintSurface(uint8_t* pixels){
+	Color8u c;
+
+	for(int y = 0; y < kAppHeight; y++){
+		for(int x = 0; x < kAppWidth; x++){
+			int pixel_Loc = x + y*kTextureSize;
+
+			cR = 3*( x + y*kTextureSize);
+			cG = 3*( x + y*kTextureSize)+1;
+			cB = 3*( x + y*kTextureSize)+2;
+
+			cR = constrain(cR, 0, 255);
+			cB = constrain(cB, 0, 255);
+			cG = constrain(cG, 0, 255);
+
+			c = Color8u(cR, cG, cB);
+			pixels[(3*(x + y*kTextureSize))] = c.r;
+			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
+		}
+	}
+}
+
 void CatPictureApp::blurSurface(uint8_t* pixels){
+
+	//Create a copy of the surface
 	static uint8_t work_buffer[3*kTextureSize*kTextureSize];
 	memcpy(work_buffer, pixels, 3*kTextureSize*kTextureSize);
 
@@ -136,22 +193,36 @@ void CatPictureApp::mouseDown( MouseEvent event )
 void CatPictureApp::update()
 {
 	uint8_t* pixels = (*mySurface).getData();	
-
+	Color8u c;
+	cG= 0;
+	cB= 0;
+	cR= 0;
 	//How do I keep changing color?
-		cG++;
-		cB++;
-		if(cG > kColorMax){
-			cG = 0;
-		}
-		if(cB > kColorMax) {
-			cB = 0;
-		}
+	cG++;
+	cB++;
+	cR++;
 	colorWholeSurface(pixels, cG, cB, cR);
+
+	
+	//tintSurface(pixels);
+	//draws the mouth
 	drawRectangles(pixels);
+
+	//draws the mustache
 	drawLine(pixels);
+
+	//draws the eyes
 	drawCircle(pixels, 150, 250, 50, 20, 230, 100);
 	drawCircle(pixels, 150, 550, 50, 20, 230, 100);
+
+	//draws the nose
 	drawCircle(pixels, 250, 400, 25, 125, 125, 125);
+
+	//draws the pupils
+	drawCircle(pixels, 175, 260, 10, 0, 0, 0);
+	drawCircle(pixels, 175, 560, 10, 0, 0, 0);
+
+	drawTriangle(pixels); 
 
 	//Saves the image to a png file
 	writeImage("brennerCatPic.png",*mySurface);
