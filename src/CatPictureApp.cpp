@@ -97,33 +97,24 @@ void CatPictureApp::drawLine(uint8_t* pixels){
 
 void CatPictureApp::drawTriangle(uint8_t* pixels){
 	Color8u c = Color8u(255,255,255);
-	for(int y = 0; y < 200; y++){
-		for(int x = 0; x < y; x++){
+
+	//Triangle in bottom left corner
+	for(int y = 400; y < kAppHeight; y++){
+		for(int x = 0; x < (y-400); x++){
 			pixels[(3*(x + y*kTextureSize))] = c.r;
 			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
 			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
 		}
 	}
 
-	/*for(int y = 0; y < 200; y++){
-		for(int s = 0 - y; s > 0; s--){
-			c = Color8u(200,200,200);
-			pixels[(3*(s + y*kTextureSize))] = c.r;
-			pixels[(3*(s + y*kTextureSize)+1)] = c.g;
-			pixels[(3*(s + y*kTextureSize)+2)] = c.b;
-
-		} 
-
-		for(int x = 500; x < kAppWidth; x++){
-			k = y-(x-300);
-			if(k>=0){
-				c = Color8u(255,255,255);
-					pixels[(3*(x + y*kTextureSize))] = c.r;
-					pixels[(3*(x + y*kTextureSize)+1)] = c.g;
-					pixels[(3*(x + y*kTextureSize)+2)] = c.b;
-				}
-		}*/
-	//}
+	//Triangle in top right corner
+	for(int y = 200; y > 0; y--){
+		for(int x = 800; x > (y+600); x--){
+			pixels[(3*(x + y*kTextureSize))] = c.r;
+			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
+		}
+	}
 }
 
 void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
