@@ -1,8 +1,24 @@
+/**
+ * @file CatPictureApp.cpp
+ * CSE 274 - Fall 2012
+ * My solution for HW01.
+ *
+ * @author Bridget Brener
+ * @date 2012-09-04
+ *
+ * @note This file is (c) 2012. It is licensed under the 
+ * CC BY 3.0 license (http://creativecommons.org/licenses/by/3.0/),
+ * which means you are free to use, share, and remix it as long as you
+ * give attribution. Commercial uses are allowed.
+ *
+ * @note This project satisfies goals A.1 (rectangle), A.2 (circle), A.3 (line),
+ * A.7 (triangle), B.1 (blur), and E.6 (mouse interaction)
+ */
+
 #include "cinder/app/AppBasic.h"
 #include "cinder/gl/gl.h"
 #include "cinder/ImageIo.h"
 #include "cinder/gl/Texture.h"
-#define PI 3.14159;
 
 using namespace ci;
 using namespace ci::app;
@@ -18,10 +34,14 @@ class CatPictureApp : public AppBasic {
 
 private:
 	Surface* mySurface;
+
+	//constants to keep my window size correct and uniform
 	static const int kTextureSize = 1024; //must be a square of 2
 	static const int kAppHeight = 600;
 	static const int kAppWidth = 800;
 	static const int kColorMax = 255;
+
+	//Methods that I created to help draw my face
 	void drawRectangles(uint8_t* pixels);
 	void drawCircle(uint8_t* pixels, int y_Center, int x_Center, int radius, int cG, int cB, int cR);
 	void colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR);
@@ -33,6 +53,11 @@ private:
 	int cR;
 };
 
+	/*
+	* Method to draw a rectangle, satisfies the rectangle requirement in A.1
+	* This draws a blue triangle that is used for the mouth of the face
+	* starting at (250, 450) and extending to (550, 550).
+	*/
 void CatPictureApp::drawRectangles(uint8_t* pixels){
 	int rect_X_Start = 250;
 	int rect_Y_Start = 450;
@@ -53,6 +78,13 @@ void CatPictureApp::drawRectangles(uint8_t* pixels){
 	}
 }
 
+	/*
+	* Method to draw circles, satisfies the circle requirement in A.2
+	* This draws a circle at a specified place.  It takes the center y point and center x point,
+	* then it takes the desired radius of the circle along with the green, blue, and red integers
+	* of what color the user desires the circle to be. These circles are used as eyes, pupils,
+	* and a nose.
+	*/
 void CatPictureApp::drawCircle(uint8_t* pixels, int y_Center, int x_Center, int radius, int cG, int cB, int cR){
 	Color8u c;
 
@@ -69,8 +101,13 @@ void CatPictureApp::drawCircle(uint8_t* pixels, int y_Center, int x_Center, int 
 	}
 }
 
-
-//Taken from http://programming-technique.blogspot.com/2012/01/implementing-bresenhams-line-drawing.html
+	/*
+	* Method to draw lines using Bresenhams line algorithm, satisfies the line requirement in A.3
+	* This draws a white line between two specified points.  It takes the beginning x point, beginning y
+	* point, ending x point, and ending y point.  I used part of the code from
+	* http://programming-technique.blogspot.com/2012/01/implementing-bresenhams-line-drawing.html
+	* These lines are used as eyebrows.
+	*/
 void CatPictureApp::drawLine(uint8_t* pixels, int x_beg, int y_beg, int x_end, int y_end){
 	Color8u c = Color8u(255, 255, 255);
 	int x_change = abs(x_beg - x_end), y_change = abs(y_beg - y_end);
@@ -107,26 +144,12 @@ void CatPictureApp::drawLine(uint8_t* pixels, int x_beg, int y_beg, int x_end, i
 		pixels[(3*(x + y*kTextureSize)+1)] = c.g;
 		pixels[(3*(x + y*kTextureSize)+2)] = c.b;
 	}
-
-	/*for(int x = 200; x <= 600; x++){
-		c = Color8u(100,100,100);
-		if(y_Coord <= 400){
-		y_Coord++;
-		pixels[(3*(x + y_Coord*kTextureSize))] = c.r;
-		pixels[(3*(x + y_Coord*kTextureSize)+1)] = c.g;
-		pixels[(3*(x + y_Coord*kTextureSize)+2)] = c.b;
-		}
-		if(y_Coord > 400){
-			for(int i = 0; i <= 100; i++){
-				y_Coord--;
-				pixels[(3*(x + y_Coord*kTextureSize))] = c.r;
-				pixels[(3*(x + y_Coord*kTextureSize)+1)] = c.g;
-				pixels[(3*(x + y_Coord*kTextureSize)+2)] = c.b;
-			}
-		}
-	}*/
 }
 
+	/*
+	* Method to draw two right triangles, satisfies the triangle requirement in A.7
+	* This draws a white triangle in the bottom left corner and in the top right corner.
+	*/
 void CatPictureApp::drawTriangle(uint8_t* pixels){
 	Color8u c = Color8u(250,250,250);
 
@@ -149,6 +172,10 @@ void CatPictureApp::drawTriangle(uint8_t* pixels){
 	}
 }
 
+	/*
+	* Method to fill the surface with a specific color.  It takes the pixels
+	* array, and three ints for the green color, blue color, and red color
+	*/
 void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	Color8u c;
 
@@ -162,7 +189,12 @@ void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 	}
 }
 
-//Took code from http://processing.org/learning/pixels/
+	/*
+	* Method to blur the surface pixels with the pixels around them, satisfies the blur requirement in B.1
+	* This should take each pixel, minus the edge pixels, take the average of all pixels around the specific
+	* pixel, and return that color the specified pixel.
+	* Took code from http://processing.org/learning/pixels/
+	*/
 void CatPictureApp::blurSurface(uint8_t* pixels){
 
 	//Create a copy of the surface
@@ -202,13 +234,13 @@ void CatPictureApp::prepareSettings(Settings* settings){
 
 void CatPictureApp::setup()
 {
-	//Loaded my picture from the Asset folder
 	mySurface = new Surface(kTextureSize,kTextureSize,false);
-	cG = 10;
-	cB = 250;
-	cR = 100;
 }
 
+/*
+* Method that pops up a message box when the user clicks on the screen.
+* This satisfies requirement E.6
+*/
 void CatPictureApp::mouseDown( MouseEvent event )
 {
 			MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
@@ -243,13 +275,12 @@ void CatPictureApp::update()
 
 	blurSurface(pixels);
 
-	//Saves the image to a png file
+	//Saves the image to a png file, satisfies requirement D
 	writeImage("brennerCatPic.png",*mySurface);
 }
 
 void CatPictureApp::draw()
 {
-	// clear out the window with black
 	gl::draw( *mySurface );
 }
 
