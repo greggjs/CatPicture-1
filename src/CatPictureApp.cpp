@@ -201,28 +201,38 @@ void CatPictureApp::blurSurface(uint8_t* pixels){
 	static uint8_t work_buffer[3*kTextureSize*kTextureSize];
 	memcpy(work_buffer, pixels, 3*kTextureSize*kTextureSize);
 	int offset;
+	Color8u c;
 	uint8_t* red = 0;
 	uint8_t* green = 0;
 	uint8_t* blue = 0;
 
 	//kernels to blur image
-	float kernelA[9] = {4,4,4,4,4,4,4,4,4};
+	float kernelA[9] = {1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0};
 
 	for(int y = 1; y < kAppHeight; y++){
 		for(int x = 1; x < kAppWidth; x++){
 			offset = 3*(x+y*kAppWidth);
+			red = 0;
+			green = 0;
+			blue = 0;
 
 			for(int i = 0; i < 9; i++){
 				for(int j = 0; j < 9; j++){
+					offset = 3*(x+j + (y+i)*kTextureSize);
+					int k = kernelA[j + i*3];
 					int xloc = x+i-offset;
 					int yloc = y+j-offset;
 					int loc = xloc + yloc*kAppWidth;
 
-					red += (work_buffer[offset]);
-					green += (work_buffer[offset+1]);
-					blue += (work_buffer[offset+2]);
+					red += (work_buffer[offset] >> k);
+					green += (work_buffer[offset+1] >> k);
+					blue += (work_buffer[offset+2] >> k);
 				}
 			}
+			c = Color8u((int)red, (int)green, (int)blue);
+			pixels[(3*(x + y*kTextureSize))] = c.r;
+			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
+			pixels[(3*(x + y*kTextureSize)+2)] = c.b;
 		}
 	}
 }
@@ -243,7 +253,8 @@ void CatPictureApp::setup()
 */
 void CatPictureApp::mouseDown( MouseEvent event )
 {
-			MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
+	uint8_t* pixels = (*mySurface).getData();
+	MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
 }
 
 void CatPictureApp::update()
