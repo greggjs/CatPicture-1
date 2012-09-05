@@ -174,8 +174,7 @@ void CatPictureApp::blurSurface(uint8_t* pixels){
 	uint8_t* blue = 0;
 
 	//kernels to blur image
-	float kernelA[9] = {1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0};
-	float kernelB[9] = {1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0};
+	float kernelA[9] = {4,4,4,4,4,4,4,4,4};
 
 	for(int y = 1; y < kAppHeight; y++){
 		for(int x = 1; x < kAppWidth; x++){
@@ -212,6 +211,7 @@ void CatPictureApp::setup()
 
 void CatPictureApp::mouseDown( MouseEvent event )
 {
+			MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
 }
 
 void CatPictureApp::update()
