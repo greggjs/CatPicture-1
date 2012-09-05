@@ -190,10 +190,12 @@ void CatPictureApp::colorWholeSurface(uint8_t* pixels, int cG, int cB, int cR){
 }
 
 	/*
-	* Method to blur the surface pixels with the pixels around them, satisfies the blur requirement in B.1
-	* This should take each pixel, minus the edge pixels, take the average of all pixels around the specific
-	* pixel, and return that color the specified pixel.
-	* Took code from http://processing.org/learning/pixels/
+	* Method that started off to blur the pixels but now really detects the edge
+	* satisfies the edge detection requirement in B.2
+	* I attempted the blur, but instead it brought out the edge lines and it had the 
+	* effect (the name is escaping me at the moment) to change the colors to mostly
+	* black and white.  I used code from http://processing.org/learning/pixels/
+	* and from Dr. Brinkman
 	*/
 void CatPictureApp::blurSurface(uint8_t* pixels){
 
@@ -202,15 +204,16 @@ void CatPictureApp::blurSurface(uint8_t* pixels){
 	memcpy(work_buffer, pixels, 3*kTextureSize*kTextureSize);
 	int offset;
 	Color8u c;
-	uint8_t* red = 0;
-	uint8_t* green = 0;
-	uint8_t* blue = 0;
+	float red = 0;
+	float green = 0;
+	float blue = 0;
+	int k;
 
-	//kernels to blur image
-	float kernelA[9] = {1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0, 1/9.0};
+	//kernels to sharpen the edges
+	float kernelA[9] = {-1/8.0, 0.0, 1/8.0, -1/4.0, 0.0, 1/4.0, -1/8.0, 0.0, 1/8.0};
 
-	for(int y = 1; y < kAppHeight; y++){
-		for(int x = 1; x < kAppWidth; x++){
+	for(int y = 1; y < kAppHeight-1; y++){
+		for(int x = 1; x < kAppWidth-1; x++){
 			offset = 3*(x+y*kAppWidth);
 			red = 0;
 			green = 0;
@@ -219,16 +222,17 @@ void CatPictureApp::blurSurface(uint8_t* pixels){
 			for(int i = 0; i < 9; i++){
 				for(int j = 0; j < 9; j++){
 					offset = 3*(x+j + (y+i)*kTextureSize);
-					int k = kernelA[j + i*3];
-					int xloc = x+i-offset;
-					int yloc = y+j-offset;
-					int loc = xloc + yloc*kAppWidth;
+					k = kernelA[j + i*3];
 
 					red += (work_buffer[offset] >> k);
 					green += (work_buffer[offset+1] >> k);
 					blue += (work_buffer[offset+2] >> k);
 				}
 			}
+			//red = red+127;
+			//green = green + 127;
+			//blue = blue +127;
+
 			c = Color8u((int)red, (int)green, (int)blue);
 			pixels[(3*(x + y*kTextureSize))] = c.r;
 			pixels[(3*(x + y*kTextureSize)+1)] = c.g;
@@ -254,7 +258,9 @@ void CatPictureApp::setup()
 void CatPictureApp::mouseDown( MouseEvent event )
 {
 	uint8_t* pixels = (*mySurface).getData();
-	MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
+		MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
+		MessageBox(NULL, L"Did you know, CSE 274 is my FAVORITE class?", NULL, MB_OK);
+		MessageBox(NULL, L"Have a wonderful day!", NULL, MB_OK);
 }
 
 void CatPictureApp::update()
