@@ -256,12 +256,12 @@ void CatPictureApp::setup()
 * This satisfies requirement E.6
 */
 void CatPictureApp::mouseDown( MouseEvent event )
-{
+{/*
 	uint8_t* pixels = (*mySurface).getData();
 		MessageBox(NULL, L"Hello, my name is Bobby.", NULL, MB_OK);
 		MessageBox(NULL, L"Did you know, CSE 274 is my FAVORITE class?", NULL, MB_OK);
 		MessageBox(NULL, L"Have a wonderful day!", NULL, MB_OK);
-}
+*/}
 
 void CatPictureApp::update()
 {
